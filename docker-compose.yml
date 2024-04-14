@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  self_hosted_github_actions:
+    image: self_hosted_github_actions
+    restart: always
+    build:
+      context: self_hosted_github_actions
+      args:
+        repo_url: <REPO_URL>
+        runner_name: <RUNNER_NAME>  # Optional
+      secrets:
+        - github_actions_token
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - internet-access
+      - internal-only
+
+  docker-registry:
+    image: registry:2.8.2
+    restart: always
+    volumes:
+      - ./docker-registry:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_LOG_LEVEL: info
+      REGISTRY_HTTP_ADDR: "0.0.0.0:80"
+    networks:
+      - internal-only
+
+  pypi-server:
+    image: pypiserver/pypiserver:latest
+    restart: always
+    volumes:
+      - ./pypiserver/packages:/data/packages
+      - ./pypiserver/.htpasswd:/data/.htpasswd
+    command: "run -P /data/.htpasswd /data/packages -a update -p 80"
+    networks:
+      - internal-only
+  
+  nginx-proxy:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - docker-registry
+      - pypi-server
+      - self_hosted_github_actions
+    networks:
+      - internal-only
+      - internet-access
+
+secrets:
+  github_actions_token:
+    file: <PATH_TO_GITHUB_ACTIONS_TOKEN>
+
+networks:
+  internet-access:
+    driver: bridge
+  internal-only:
+    driver: bridge
+    internal: true

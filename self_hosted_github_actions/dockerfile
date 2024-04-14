@@ -1,0 +1,29 @@
+FROM ubuntu:focal
+
+WORKDIR /work
+RUN apt update && \
+apt install -y git curl jq && \
+DEBIAN_FRONTEND=noninteractive TZ=Europe/London apt-get install -y libicu66 && \
+apt install -y --no-install-recommends docker.io && \
+apt clean
+
+RUN curl -L "https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz" -o /work/runner.tar.gz
+RUN mkdir -p ~/.docker/cli-plugins/
+RUN curl -L "https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
+RUN chmod a+x ~/.docker/cli-plugins/docker-buildx
+
+RUN tar xzf /work/runner.tar.gz && \
+    rm /work/runner.tar.gz 
+
+RUN bash /work/bin/installdependencies.sh
+
+ARG repo_url
+ARG runner_name
+
+RUN --mount=type=secret,id=github_actions_token,target=/github_actions_token \
+    RUNNER_ALLOW_RUNASROOT=1 /work/config.sh \
+    --url $repo_url \
+    --name $runner_name \
+    --token $(cat /github_actions_token)
+
+ENTRYPOINT RUNNER_ALLOW_RUNASROOT=1 /work/run.sh
