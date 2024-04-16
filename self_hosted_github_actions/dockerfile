@@ -26,4 +26,7 @@ RUN --mount=type=secret,id=github_actions_token,target=/github_actions_token \
     --name $runner_name \
     --token $(cat /github_actions_token)
 
+# Install dig to allow for DNS resolution
+RUN apt install dnsutils -y
+
 ENTRYPOINT RUNNER_ALLOW_RUNASROOT=1 /work/run.sh

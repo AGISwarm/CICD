@@ -2,3 +2,4 @@ docker-registry/docker
 pypiserver/packages
 pypiserver/.htpasswd
 self_hosted_github_actions/github_actions_token
+auth.txt
