@@ -4,7 +4,7 @@ services:
     image: self_hosted_github_actions
     restart: always
     build:
-      context: self_hosted_github_actions
+      context: ./self_hosted_github_actions
       args:
         repo_url: <REPO_URL>
         runner_name: <RUNNER_NAME>  # Optional
@@ -21,10 +21,14 @@ services:
     restart: always
     volumes:
       - ./docker-registry:/var/lib/registry
+      - ./docker-registry/.htpasswd:/auth/htpasswd
     environment:
       REGISTRY_STORAGE_DELETE_ENABLED: "true"
       REGISTRY_LOG_LEVEL: info
       REGISTRY_HTTP_ADDR: "0.0.0.0:80"
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: "Registry Realm"
     networks:
       - internal-only
 
