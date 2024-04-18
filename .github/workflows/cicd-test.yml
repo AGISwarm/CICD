@@ -1,0 +1,51 @@
+name: Full CICD Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+  
+    - name: Build Docker Images
+      run: |
+        docker-compose -f docker-compose.yml build
+
+    - name: Start Docker Compose Services
+      run: |
+        docker-compose -f docker-compose.yml up -d
+
+    - name: Wait for Services to Start
+      run: sleep 30
+
+    - name: Check Service Status
+      run: |
+        docker-compose -f docker-compose.yml ps
+
+    - name: Test Docker Registry
+      run: |
+        curl -u user:password http://localhost:5000/v2/  # Adjust port and auth as necessary
+
+    - name: Test PyPI Server
+      run: |
+        curl http://localhost:8080/  # Adjust port as necessary
+
+    - name: Clean up
+      run: |
+        docker-compose -f docker-compose.yml down
