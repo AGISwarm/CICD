@@ -15,7 +15,13 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-
+      
+    - name: Manually Set Up Docker Buildx
+      run: |
+        mkdir -p ~/.docker/cli-plugins/
+        curl -L "https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
+        chmod a+x ~/.docker/cli-plugins/docker-buildx
+    
     - name: Build Docker Images
       run: |
         docker-compose -f docker-compose.yml build
