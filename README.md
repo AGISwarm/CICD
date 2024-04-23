@@ -33,16 +33,77 @@ secrets:
         file: <PATH_TO_GITHUB_ACTIONS_TOKEN>
 ```
 
-### Starting Services
+### Authentication Configuration
+
+1. Create a `.htpasswd` file for the Docker Registry.
+   1. Run this command and follow the instructions to create a password
+    ```bash
+    htpasswd -c .htpasswd <USERNAME>
+    ```
+   2. Move the `.htpasswd` file to the `docker-registry` directory.
+    ```bash
+    mv .htpasswd docker-registry/
+    ```
+
+2. Create a `.htpasswd` file for the PyPI server.
+   1. Run this command and follow the instructions to create a password
+    ```bash
+    htpasswd -c .htpasswd <USERNAME>
+    ```
+   2. Move the `.htpasswd` file to the `pypiserver` directory.
+    ```bash
+    mv .htpasswd pypi-server/
+    ```
+
+## Starting Services
 
 To launch all services:
 ```bash
 docker-compose up -d
 ```
 
-## Usage
+Now, you have a self-hosted CI/CD environment with a GitHub Actions runner, a private Docker registry, and a PyPI server.
+Refer to [python-template](https://github.com/AGISwarm/python-template) for an example repository that uses this CI/CD environment.
 
-This setup allows continuous integration and deployment within a self-managed environment, reducing external dependencies.
+## Using the PyPI Server and the Docker Registry directly from your host machine
+
+With Nginx running, you can access the PyPI server and the Docker Registry from your host machine by their service names, without needing to expose their ports.
+For docker registry, you have to specify default port 80. Otherwise docker commands will not work.
+You do not need to manage ports or IP addresses manually.
+
+### PyPI Server
+
+To upload a package to the PyPI server:
+```bash
+twine upload --repository-url http://pypi-server/ dist/* --username <USERNAME> --password <PASSWORD>
+```
+
+To install a package from the PyPI server:
+```bash
+pip install --extra-index-url http://pypi-server/ --trusted-host pypi-server <PACKAGE_NAME>
+```
+
+### Docker Registry
+
+To push an image to the Docker Registry:
+```bash
+docker tag <IMAGE_NAME> docker-registry:80/<IMAGE_NAME>
+docker login docker-registry:80 -u <USERNAME> -p <PASSWORD>
+docker push docker-registry:80/<IMAGE_NAME>
+```
+
+To pull an image from the Docker Registry:
+```bash
+docker login docker-registry:80 -u <USERNAME> -p <PASSWORD>
+docker pull docker-registry:80/<IMAGE_NAME>
+```
+
+## Stopping Services
+
+To stop all services:
+```bash
+docker-compose down
+```
 
 ## License
 
