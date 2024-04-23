@@ -65,7 +65,7 @@ docker-compose up -d
 Now, you have a self-hosted CI/CD environment with a GitHub Actions runner, a private Docker registry, and a PyPI server.
 Refer to [python-template](https://github.com/AGISwarm/python-template) for an example repository that uses this CI/CD environment.
 
-## Using the PyPI Server and the Docker Registry directly from your host machine
+## Using PyPI Server and Docker Registry directly from your host machine
 
 With Nginx running, you can access the PyPI server and the Docker Registry from your host machine by their service names, without needing to expose their ports.
 For docker registry, you have to specify default port 80. Otherwise docker commands will not work.
