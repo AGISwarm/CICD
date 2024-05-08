@@ -6,31 +6,13 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
-
+    runs-on: self-hosted
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
-      
-    - name: Manually Set Up Docker Buildx
-      run: |
-        mkdir -p ~/.docker/cli-plugins/
-        curl -L "https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
-        chmod a+x ~/.docker/cli-plugins/docker-buildx
-        docker buildx install
-        docker buildx create --use
-  
     - name: Start Docker Compose Services
       run: |
         docker-compose up -d
-
-    - name: Start Docker Compose Services
-      run: |
-        docker-compose -f docker-compose.yml up -d
 
     - name: Wait for Services to Start
       run: sleep 30
