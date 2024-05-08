@@ -24,9 +24,9 @@ jobs:
         docker buildx install
         docker buildx create --use
   
-    - name: Build Docker Images
+    - name: Start Docker Compose Services
       run: |
-        docker-compose -f docker-compose.yml build
+        docker-compose up -d
 
     - name: Start Docker Compose Services
       run: |
