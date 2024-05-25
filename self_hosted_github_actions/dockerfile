@@ -7,6 +7,7 @@ DEBIAN_FRONTEND=noninteractive TZ=Europe/London apt-get install -y libicu66 && \
 apt install -y --no-install-recommends docker.io && \
 apt install -y docker-compose && \
 apt install build-essential && \
+apt-get install -y lsb-release && \
 apt clean
 
 RUN curl -L "https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz" -o /work/runner.tar.gz
