@@ -5,12 +5,15 @@ RUN apt update && \
 apt install -y git curl jq && \
 DEBIAN_FRONTEND=noninteractive TZ=Europe/London apt-get install -y libicu66 && \
 apt install -y --no-install-recommends docker.io && \
+apt install -y docker-compose && \
+apt install build-essential && \
 apt clean
 
 RUN curl -L "https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz" -o /work/runner.tar.gz
 RUN mkdir -p ~/.docker/cli-plugins/
 RUN curl -L "https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
 RUN chmod a+x ~/.docker/cli-plugins/docker-buildx
+RUN docker buildx install
 
 RUN tar xzf /work/runner.tar.gz && \
     rm /work/runner.tar.gz 
