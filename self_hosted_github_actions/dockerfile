@@ -6,11 +6,11 @@ apt install -y git curl jq && \
 DEBIAN_FRONTEND=noninteractive TZ=Europe/London apt-get install -y libicu66 && \
 apt install -y --no-install-recommends docker.io && \
 apt install -y docker-compose && \
-apt install build-essential && \
+apt install -y build-essential && \
 apt-get install -y lsb-release && \
 apt clean
 
-RUN curl -L "https://github.com/actions/runner/releases/download/v2.315.0/actions-runner-linux-x64-2.315.0.tar.gz" -o /work/runner.tar.gz
+RUN curl -L "https://github.com/actions/runner/releases/download/v2.323.0/actions-runner-linux-x64-2.323.0.tar.gz" -o /work/runner.tar.gz
 RUN mkdir -p ~/.docker/cli-plugins/
 RUN curl -L "https://github.com/docker/buildx/releases/download/v0.10.3/buildx-v0.10.3.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
 RUN chmod a+x ~/.docker/cli-plugins/docker-buildx
@@ -27,8 +27,8 @@ ARG runner_name
 RUN --mount=type=secret,id=github_actions_token,target=/github_actions_token \
     RUNNER_ALLOW_RUNASROOT=1 /work/config.sh \
     --url $repo_url \
-    --name $runner_name \
-    --token $(cat /github_actions_token)
+    --token $(cat /github_actions_token) \
+    --name $runner_name
 
 # Install dig to allow for DNS resolution
 RUN apt install dnsutils -y
